@@ -9,7 +9,7 @@ export default class Auth {
     redirectUri: AUTH_CONFIG.callbackUrl,
     audience: `https://${AUTH_CONFIG.domain}/userinfo`,
     responseType: 'token id_token',
-    scope: 'openid',
+    scope: 'openid profile',
     prompt: 'none'
   });
 
@@ -38,10 +38,13 @@ export default class Auth {
   }
 
   setSession(authResult) {
+    console.log(authResult);
     // Set the time that the access token will expire at
     let expiresAt = JSON.stringify((authResult.expiresIn * 1000) + new Date().getTime());
     localStorage.setItem('access_token', authResult.accessToken);
     localStorage.setItem('id_token', authResult.idToken);
+    localStorage.setItem('default_tenant', authResult.idTokenPayload["https://cloud.configit.com/default_tenant"]);
+    localStorage.setItem('name', authResult.idTokenPayload["name"]);
     localStorage.setItem('expires_at', expiresAt);
     // navigate to the home route
     history.replace('/home');
@@ -54,6 +57,18 @@ export default class Auth {
     localStorage.removeItem('expires_at');
     // navigate to the home route
     history.replace('/home');
+  }
+
+  getDefaultTenant(){
+        // Check whether the current time is past the 
+    // access token's expiry time
+    return localStorage.getItem('default_tenant');
+  }
+
+  getName(){
+    // Check whether the current time is past the 
+    // access token's expiry time
+  return localStorage.getItem('name');
   }
 
   isAuthenticated() {
